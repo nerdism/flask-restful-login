@@ -54,11 +54,11 @@ def create_app():
     return app
 
 
-if __name__ == '__main__':
+app = create_app()
+#if __name__ == '__main__':
 
     # Create app.
-    app = create_app()
 
     # Run app. For production use another web server.
     # Set debug and use_reloader parameters as False.
-    app.run(port=5000, debug=True, host='localhost', use_reloader=True)
+    #app.run(port=5000, debug=True, host='localhost', use_reloader=True)
