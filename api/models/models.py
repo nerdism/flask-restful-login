@@ -6,55 +6,37 @@ from datetime import datetime
 from flask import g
 
 from api.conf.auth import auth, jwt
-from api.database.database import db
+#from api.database.database import db
+from mongoengine import Document
+from mongoengine import DateTimeField, StringField, ListField
 
 
-class User(db.Model):
+class User(Document):
 
-    # Generates default class name for table. For changing use
-    # __tablename__ = 'users'
-
-    # User id.
-    id = db.Column(db.Integer, primary_key=True)
-
-    # User name.
-    username = db.Column(db.String(length=80))
-
-    # User password.
-    password = db.Column(db.String(length=80))
 
     # User email address.
-    email = db.Column(db.String(length=80))
+    email = StringField(max_length=80, required=True, unique=True)
 
-    # Creation time for user.
-    created = db.Column(db.DateTime, default=datetime.utcnow)
+    # User Password
 
-    # Unless otherwise stated default role is user.
-    user_role = db.Column(db.String, default="user")
+    password = StringField(max_length=34, required=True)
+
+    note_url = StringField()
+
+    md_url = StringField()
+
+    cards_url = StringField()
+
+    last_modified = DateTimeField(default=datetime.utcnow)
 
     # Generates auth token.
-    def generate_auth_token(self, permission_level):
+    def generate_auth_token(self):
 
-        # Check if admin.
-        if permission_level == 1:
+        # Generate admin token with flag 1.
+        token = jwt.dumps({"email": self.email})
 
-            # Generate admin token with flag 1.
-            token = jwt.dumps({"email": self.email, "admin": 1})
+        return token
 
-            # Return admin flag.
-            return token
-
-            # Check if admin.
-        elif permission_level == 2:
-
-            # Generate admin token with flag 1.
-            token = jwt.dumps({"email": self.email, "admin": 2})
-
-            # Return admin flag.
-            return token
-
-        # Return normal user flag.
-        return jwt.dumps({"email": self.email, "admin": 0})
 
     # Generates a new access token from refresh token.
     @staticmethod
@@ -73,13 +55,10 @@ class User(db.Model):
             return False
 
         # Check if email and admin permission variables are in jwt.
-        if "email" and "admin" in data:
+        if "email" in data:
 
             # Set email from jwt.
             g.user = data["email"]
-
-            # Set admin permission from jwt.
-            g.admin = data["admin"]
 
             # Return true.
             return True
@@ -90,15 +69,11 @@ class User(db.Model):
     def __repr__(self):
 
         # This is only for representation how you want to see user information after query.
-        return "<User(id='%s', name='%s', password='%s', email='%s', created='%s')>" % (
-            self.id,
-            self.username,
-            self.password,
+        return "<User(email='%s')>" % (
             self.email,
-            self.created,
         )
 
-
+"""
 class Blacklist(db.Model):
 
     # Generates default class name for table. For changing use
@@ -117,3 +92,4 @@ class Blacklist(db.Model):
             self.id,
             self.refresh_token,
         )
+"""

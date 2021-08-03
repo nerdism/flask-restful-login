@@ -10,7 +10,7 @@ from flask_restful import Resource
 import api.error.errors as error
 from api.conf.auth import auth, refresh_jwt
 from api.database.database import db
-from api.models.models import Blacklist, User
+from api.models.models import User
 from api.roles import role_required
 from api.schemas.schemas import UserSchema
 
@@ -26,40 +26,39 @@ class Register(Resource):
     def post():
 
         try:
-            # Get username, password and email.
-            username, password, email = (
-                request.json.get("username").strip(),
-                request.json.get("password").strip(),
+            # Get password and email.
+            email, password = (
                 request.json.get("email").strip(),
+                request.json.get("password").strip()
             )
+            print(email, password)
+
         except Exception as why:
 
             # Log input strip or etc. errors.
-            logging.info("Username, password or email is wrong. " + str(why))
+            logging.info("email is wrong or email/password not provided. " + str(why))
 
             # Return invalid input error.
             return error.INVALID_INPUT_422
 
+        
         # Check if any field is none.
-        if username is None or password is None or email is None:
+        if email is None:
             return error.INVALID_INPUT_422
 
         # Get user if it is existed.
-        user = User.query.filter_by(email=email).first()
+        user = User.objects(email=email).first()
+
+        print(email)
 
         # Check if user is existed.
         if user is not None:
             return error.ALREADY_EXIST
 
         # Create a new user.
-        user = User(username=username, password=password, email=email)
+        user = User(email=email, password=password)
 
-        # Add user to session.
-        db.session.add(user)
-
-        # Commit session.
-        db.session.commit()
-
+        user.save()
         # Return success if registration is completed.
         return {"status": "registration completed."}
 
@@ -71,10 +70,9 @@ class Login(Resource):
         try:
             # Get user email and password.
             email, password = (
-                request.json.get("email").strip(),
-                request.json.get("password").strip(),
-            )
-
+                    request.json.get("email").strip(),
+                    request.json.get("password").strip()
+                    )
         except Exception as why:
 
             # Log input strip or etc. errors.
@@ -88,31 +86,16 @@ class Login(Resource):
             return error.INVALID_INPUT_422
 
         # Get user if it is existed.
-        user = User.query.filter_by(email=email, password=password).first()
+        #user = User.query.filter_by(email=email, password=password).first()
+        user = User.objects(email=email, password=password).first()
 
         # Check if user is not existed.
         if user is None:
             return error.UNAUTHORIZED
 
-        if user.user_role == "user":
+        # Generate access token. This method takes boolean value for checking admin or normal user. Admin: 1 or 0.
+        access_token = user.generate_auth_token()
 
-            # Generate access token. This method takes boolean value for checking admin or normal user. Admin: 1 or 0.
-            access_token = user.generate_auth_token(0)
-
-        # If user is admin.
-        elif user.user_role == "admin":
-
-            # Generate access token. This method takes boolean value for checking admin or normal user. Admin: 1 or 0.
-            access_token = user.generate_auth_token(1)
-
-        # If user is super admin.
-        elif user.user_role == "sa":
-
-            # Generate access token. This method takes boolean value for checking admin or normal user. Admin: 2, 1, 0.
-            access_token = user.generate_auth_token(2)
-
-        else:
-            return error.INVALID_INPUT_422
 
         # Generate refresh token.
         refresh_token = refresh_jwt.dumps({"email": email})
@@ -269,28 +252,4 @@ class UsersData(Resource):
             return error.INVALID_INPUT_422
 
 
-# auth.login_required: Auth is necessary for this handler.
-# role_required.permission: Role required user=0, admin=1 and super admin=2.
 
-
-class DataUserRequired(Resource):
-    @auth.login_required
-    def get(self):
-
-        return "Test user data."
-
-
-class DataAdminRequired(Resource):
-    @auth.login_required
-    @role_required.permission(1)
-    def get(self):
-
-        return "Test admin data."
-
-
-class DataSuperAdminRequired(Resource):
-    @auth.login_required
-    @role_required.permission(2)
-    def get(self):
-
-        return "Test super admin data."

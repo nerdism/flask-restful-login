@@ -1,7 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from flask_sqlalchemy import SQLAlchemy
+from flask_mongoengine import MongoEngine
 
-# Create sql alchemy database object.
-db = SQLAlchemy()
+
+db = None
+
+
+def create_db(app):
+    db = MongoEngine(app)
+    
+
+
