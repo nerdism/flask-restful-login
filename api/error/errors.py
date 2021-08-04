@@ -11,3 +11,5 @@ UNAUTHORIZED = ({"message": "Wrong credentials."}, 401)
 DOES_NOT_EXIST = ({"message": "Does not exists."}, 409)
 NOT_ADMIN = ({"message": "Admin permission denied."}, 999)
 HEADER_NOT_FOUND = ({"message": "Header does not exists."}, 999)
+
+ALREADY_LOGIN = ({"message": "Already Logged in."}, 409)

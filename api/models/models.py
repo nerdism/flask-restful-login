@@ -19,7 +19,9 @@ class User(Document):
 
     # User Password
 
-    password = StringField(max_length=34, required=True)
+    password = StringField(max_length=80, required=True)
+
+    refresh_token = StringField()
 
     note_url = StringField()
 
@@ -67,11 +69,10 @@ class User(Document):
         return False
 
     def __repr__(self):
-
-        # This is only for representation how you want to see user information after query.
-        return "<User(email='%s')>" % (
-            self.email,
-        )
+        return "User[email={}, refresh_token={}]".format(self.email, self.refresh_token)
+    
+    def __str__(self):
+        return "User[email={}, refresh_token={}]".format(self.email, self.refresh_token)
 
 """
 class Blacklist(db.Model):

@@ -4,7 +4,7 @@
 from flask_mongoengine import MongoEngine
 
 
-db = None
+db = MongoEngine()
 
 
 def create_db(app):

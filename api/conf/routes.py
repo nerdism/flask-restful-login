@@ -10,7 +10,6 @@ from api.handlers.UserHandlers import (
     RefreshToken,
     Register,
     ResetPassword,
-    UsersData,
     )
 
 
@@ -38,5 +37,3 @@ def generate_routes(app):
     # Password reset page. Not forgot.
     api.add_resource(ResetPassword, "/v1/auth/password_reset")
 
-    # Get users page with admin permissions.
-    api.add_resource(UsersData, "/users")
