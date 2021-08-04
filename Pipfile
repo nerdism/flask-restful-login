@@ -21,6 +21,7 @@ SQLAlchemy = "==1.4.10"
 Werkzeug = "==1.0.1"
 mongoengine = "*"
 flask-mongoengine = "*"
+flask-bcrypt = "*"
 
 [dev-packages]
 
