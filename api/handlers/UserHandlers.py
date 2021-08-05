@@ -96,7 +96,7 @@ class Login(Resource):
         # Get user if it is existed.
         user = User.objects(email=email).first()
 
-        if user is None or not kb_bcrypt.check_password_hash(user.password, password):
+        if user is None or not get_bcrypt().check_password_hash(user.password, password):
             return error.UNAUTHORIZED
     
         # Check if already logged in
@@ -196,7 +196,7 @@ class ResetPassword(Resource):
             return {"status": "old password does not match."}
 
         # Update password.
-        user.update(password=kb_bcrypt.generate_password_hash(new_pass))
+        user.update(password=get_bcrypt().generate_password_hash(new_pass))
 
         # Return success status.
         return {"status": "password changed."}
