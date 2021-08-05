@@ -4,17 +4,17 @@
 import logging
 from datetime import datetime
 
-from flask import g, request, jsonify
+from flask import g, request, jsonify, current_app, render_template
 from flask_restful import Resource
-from api.conf.utils import kb_bcrypt
+from api.conf.utils import get_mail, get_bcrypt, send_mail
 
 import api.error.errors as error
 from api.conf.auth import auth, refresh_jwt
-from api.database.database import db
 from api.models.models import User
 from api.roles import role_required
 from api.schemas.schemas import UserSchema
 
+from flask_mail import Message
 
 
 
@@ -55,10 +55,18 @@ class Register(Resource):
         if user is not None:
             return error.ALREADY_EXIST
 
-        # Create a new user.
-        user = User(email=email, password=kb_bcrypt.generate_password_hash(password))
+        print('low')
 
+        # Create a new user.
+        user = User(email=email, password=get_bcrypt().generate_password_hash(password))
+        
         user.save()
+        
+        # Send a verification email
+        msg = Message('Kbapp registration verification', sender='n.nomaly@gmail.com', recipients=[email])
+        msg.html = render_template('verify_email.html')
+        send_mail(msg)
+
         # Return success if registration is completed.
         return {"status": "registration completed."}
 

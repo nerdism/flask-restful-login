@@ -6,13 +6,14 @@ import os
 from flask import Flask
 
 from api.conf.routes import generate_routes
-from api.database.database import create_db
-from api.conf.utils import create_bcrypt
 
-from config.config import DB, HOST, PORT
+from config.config import (MONGO_DB, MONGO_HOST, MONGO_PORT ,
+        MAIL_SERVER, MAIL_PORT, MAIL_PASSWORD, MAIL_USE_SSL, MAIL_USERNAME, MAIL_PASSWORD,
+        APP_DEBUG)
 
+from api.conf.utils import init_mail, init_bcrypt
+from api.database.database import init_db
 import logging
-
 
 
 def create_app():
@@ -22,25 +23,33 @@ def create_app():
     app = Flask(__name__)
 
     # Set debug true for catching the errors.
-    app.config['DEBUG'] = True
+    app.config['DEBUG'] = APP_DEBUG
+
 
     # Mongodb config
     
     app.config['MONGODB_SETTINGS'] = {
-            'db': DB,
-            'host': HOST,
-            'port': PORT 
+            'db': MONGO_DB,
+            'host': MONGO_HOST,
+            'port': MONGO_PORT 
     }
+
+    # Mail Config
+    app.config['MAIL_SERVER'] = MAIL_SERVER
+    app.config['MAIL_PORT'] = MAIL_PORT
+    app.config['MAIL_USERNAME'] = MAIL_USERNAME
+    app.config['MAIL_PASSWORD'] = MAIL_PASSWORD
+    app.config['MAIL_USE_SSL'] = MAIL_USE_SSL
+
 
     # Generate routes.
     generate_routes(app)
 
-    # Create mongo database
-    create_db(app)
+    init_mail(app)
 
-    # Create Bcrypt class
-    create_bcrypt(app)
+    init_bcrypt(app)
 
+    init_db(app)
 
     # Return app.
     return app

@@ -22,6 +22,7 @@ Werkzeug = "==1.0.1"
 mongoengine = "*"
 flask-mongoengine = "*"
 flask-bcrypt = "*"
+flask-mail = "*"
 
 [dev-packages]
 
