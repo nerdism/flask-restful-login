@@ -7,7 +7,7 @@ from flask import Flask
 
 from api.conf.routes import generate_routes
 
-from config.config import (MONGO_DB, MONGO_HOST, MONGO_PORT ,
+from config.config import (MONGO_DB, MONGO_HOST, MONGO_PORT , MONGO_USERNAME, MONGO_PASSWORD,
         MAIL_SERVER, MAIL_PORT, MAIL_PASSWORD, MAIL_USE_SSL, MAIL_USERNAME, MAIL_PASSWORD,
         APP_DEBUG, LOG_PATH)
 
@@ -30,7 +30,9 @@ def create_app():
     app.config['MONGODB_SETTINGS'] = {
             'db': MONGO_DB,
             'host': MONGO_HOST,
-            'port': MONGO_PORT
+            'port': MONGO_PORT,
+            'username': MONGO_USERNAME,
+            'password': MONGO_PASSWORD
     }
 
     # Mail Config
