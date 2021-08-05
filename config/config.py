@@ -5,6 +5,7 @@ import os
 #-------------- App Config --------------
 
 APP_DEBUG = int(os.environ.get('APP_DEBUG'))
+APP_EMAIL = os.environ.get('APP_EMAIL')
 
 
 #-------------- Log Config --------------
@@ -24,6 +25,7 @@ MONGO_PORT = int(os.environ.get('MONGO_PORT'))
 MONGO_DB = os.environ.get('MONGO_DB')
 MONGO_USERNAME = os.environ.get('MONGO_USERNAME')
 MONGO_PASSWORD = os.environ.get('MONGO_PASSWORD')
+MONGO_AUTH_SRC = os.environ.get('MONGO_AUTH_SRC')
 
 
 #------------ Mail Config ----------------

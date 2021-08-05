@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from config.config import APP_EMAIL
 from datetime import datetime
 
 from flask import g, request, jsonify, current_app, render_template
@@ -15,6 +16,8 @@ from api.roles import role_required
 from api.schemas.schemas import UserSchema
 
 from flask_mail import Message
+
+
 
 
 
@@ -61,7 +64,7 @@ class Register(Resource):
         user.save()
         
         # Send a verification email
-        msg = Message('Kbapp registration verification', sender='n.nomaly@gmail.com', recipients=[email])
+        msg = Message('Kbapp registration verification', sender=APP_EMAIL, recipients=[email])
         msg.html = render_template('verify_email.html')
         utils.send_mail(msg)
 
