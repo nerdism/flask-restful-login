@@ -9,10 +9,10 @@ from api.conf.routes import generate_routes
 
 from config.config import (MONGO_DB, MONGO_HOST, MONGO_PORT ,
         MAIL_SERVER, MAIL_PORT, MAIL_PASSWORD, MAIL_USE_SSL, MAIL_USERNAME, MAIL_PASSWORD,
-        APP_DEBUG)
+        APP_DEBUG, LOG_PATH)
 
-from api.conf.utils import init_mail, init_bcrypt
-from api.database.database import init_db
+from api.conf.utils import utils
+from api.database.database import database
 import logging
 
 
@@ -24,14 +24,13 @@ def create_app():
 
     # Set debug true for catching the errors.
     app.config['DEBUG'] = APP_DEBUG
-
-
+    
     # Mongodb config
     
     app.config['MONGODB_SETTINGS'] = {
             'db': MONGO_DB,
             'host': MONGO_HOST,
-            'port': MONGO_PORT 
+            'port': MONGO_PORT
     }
 
     # Mail Config
@@ -41,15 +40,18 @@ def create_app():
     app.config['MAIL_PASSWORD'] = MAIL_PASSWORD
     app.config['MAIL_USE_SSL'] = MAIL_USE_SSL
 
+    print(MAIL_SERVER)
+
+    # Log Config
+    logging.basicConfig(filename=LOG_PATH, level=logging.DEBUG, format=f'%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
 
     # Generate routes.
     generate_routes(app)
 
-    init_mail(app)
-
-    init_bcrypt(app)
-
-    init_db(app)
+    with app.app_context():
+        utils.init_mail(app)
+        utils.init_bcrypt(app)
+        database.init_db(app)
 
     # Return app.
     return app

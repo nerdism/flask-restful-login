@@ -6,7 +6,7 @@ from datetime import datetime
 
 from flask import g, request, jsonify, current_app, render_template
 from flask_restful import Resource
-from api.conf.utils import get_mail, get_bcrypt, send_mail
+from api.conf.utils import utils
 
 import api.error.errors as error
 from api.conf.auth import auth, refresh_jwt
@@ -55,17 +55,15 @@ class Register(Resource):
         if user is not None:
             return error.ALREADY_EXIST
 
-        print('low')
-
         # Create a new user.
-        user = User(email=email, password=get_bcrypt().generate_password_hash(password))
+        user = User(email=email, password=utils.get_bcrypt.generate_password_hash(password))
         
         user.save()
         
         # Send a verification email
         msg = Message('Kbapp registration verification', sender='n.nomaly@gmail.com', recipients=[email])
         msg.html = render_template('verify_email.html')
-        send_mail(msg)
+        utils.send_mail(msg)
 
         # Return success if registration is completed.
         return {"status": "registration completed."}
@@ -96,7 +94,7 @@ class Login(Resource):
         # Get user if it is existed.
         user = User.objects(email=email).first()
 
-        if user is None or not get_bcrypt().check_password_hash(user.password, password):
+        if user is None or not utils.get_bcrypt.check_password_hash(user.password, password):
             return error.UNAUTHORIZED
     
         # Check if already logged in
@@ -196,7 +194,7 @@ class ResetPassword(Resource):
             return {"status": "old password does not match."}
 
         # Update password.
-        user.update(password=get_bcrypt().generate_password_hash(new_pass))
+        user.update(password=utils.get_bcrypt.generate_password_hash(new_pass))
 
         # Return success status.
         return {"status": "password changed."}

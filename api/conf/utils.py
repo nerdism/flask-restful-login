@@ -5,39 +5,31 @@ from flask_mail import Mail, Message
 from flask import current_app, g
 
 
-def init_bcrypt(app):
-    if 'kb_bcrypt' not in g:
-        g.kb_bcrypt = Bcrypt(app)
+
+class Utils:
+
+    def init_bcrypt(self, app):
+        self.kb_bcrypt = Bcrypt(app)
+
+    @property
+    def get_bcrypt(self):
+        return self.kb_bcrypt
+
+    def init_mail(self, app):
+        self.kb_mail = Mail(app)
+
+    @property
+    def get_mail(self):
+        return self.kb_mail
 
 
-def get_bcrypt():
-    if 'kb_bcrypt' in g:
-        return g.kb_bcrypt
-    logging.warn("kb_bcrypt is None in global object")
-    return None 
-
-
-def init_mail(app):
-    if 'kb_mail' not in g:
-        g.kb_mail = Mail(app)
-
-
-def get_mail():
-    if 'kb_mail' in g:
-        return g.kb_mail
-
-    logging.warn('kb_mail is None in global object')
-    return None
-
-
-
-def send_mail(msg):
-    with current_app.app_context:
-        g.kb_mail.send(msg)
+    def send_mail(self, msg):
+        with current_app.app_context():
+            self.kb_mail.send(msg)
 
     
     
-
+utils = Utils()
 
 
 
